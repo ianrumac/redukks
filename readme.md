@@ -15,6 +15,11 @@ so now I've decided to make them into a library I can both re-use and share.
 The goal is to provide simple, type-safe, and testable abstractions for redux-like architecture,
 while still not tying you completely to a single pattern, providing you with abstractions that can help you build your own solution.
 
+## How redux works?
+
+!["How redux works"](./redux.png)
+
+
 ## Quickstart
 
 1. Add the dependency to your project
@@ -127,7 +132,7 @@ context.store.listen().collectLatest { state ->
 }
 ```
 
-### For Android developers
+## For Android developers
 
 You can use Redukks with Android's ViewModel easily. You can collect the store as a StateFlow or use it with LiveData. 
 Your ViewModel can also implement `Dispatcher<Actions>` so you can dispatch the actions upstream.
@@ -179,6 +184,8 @@ class AddForUser : Actions({
 
 This works beautifully with Jetpack Compose, since you can easily derive the UI from the state (please, map it
 to a viewmodel before doing so).
+
+!["How redux works on Android"](./redux_android.png)
 
 ## General Usage
 
@@ -269,7 +276,7 @@ First, we need a context that these actions can be executed on.
 
 While for simple cases (i.e. simply updating the store) you can just use a `Store<StateType>`, it's better to create a custom context.
 This gives you an easy way to access dependencies, mock them, replace them, etc. Also, it's a good practice to keep
-them actions tightly coupled to them, so that you can easily see what actions need what dependencies.
+the actions tightly coupled to them, so that you can easily see what actions need what dependencies.
 
 With Kotlin's context receivers on the way, the code can be even cleaner in the future,
 removing the need for actions entirely and just implementing simple functions upon the receivers. But since most 
