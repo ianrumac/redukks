@@ -1,0 +1,126 @@
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.8.0'
+    id 'org.jetbrains.kotlin.native.cocoapods' version "1.8.10"
+    id 'maven-publish'
+    id 'com.chromaticnoise.multiplatform-swiftpackage' version "2.0.3"
+}
+apply from: 'libraries.gradle'
+
+group = 'com.ianrumac'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ianrumac/redukks") // Github Package
+            credentials {
+                username = System.getenv("GPR_USER")
+                password = System.getenv("GPR_API_KEY")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            groupId = "com.ianrumac.redukks"
+            version = this.version
+            artifactId = "redukks"
+        }
+    }
+
+}
+
+
+kotlin {
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        summary = "Redukks library for Redux-like state management in Kotlin Multiplatform"
+        homepage = "github.com/ianrumac/redukks"
+        version = this.version
+        ios.deploymentTarget = "14.1"
+        framework {
+            baseName = "Redukks"
+        }
+    }
+
+    jvm {
+        jvmToolchain(11)
+        withJava()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
+    js(BOTH) {
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    it.enabled.set(true)
+                }
+            }
+        }
+    }
+    def hostOs = System.getProperty("os.name")
+    def isMingwX64 = hostOs.startsWith("Windows")
+    def nativeTarget
+    if (hostOs == "Mac OS X") nativeTarget = macosX64('native') else if (hostOs == "Linux") nativeTarget = linuxX64("native") else if (isMingwX64) nativeTarget = mingwX64("native") else throw new GradleException("Host OS is not supported in Kotlin/Native.")
+
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation libraries.kotlinx_coroutines
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation libraries.kotlinx_coroutines_test
+                implementation kotlin('test')
+            }
+        }
+
+        appleMain {
+            dependsOn commonMain
+        }
+        appleTest {
+            dependsOn commonTest
+        }
+
+        iosMain {
+            dependsOn appleMain
+        }
+        iosArm64Main {
+            dependsOn appleMain
+        }
+        iosX64Main {
+            dependsOn appleMain
+        }
+        iosSimulatorArm64Main {
+            dependsOn appleMain
+        }
+
+        iosTest {
+            dependsOn appleTest
+        }
+        iosSimulatorArm64Test {
+            dependsOn appleTest
+        }
+        iosX64Test {
+            dependsOn appleTest
+        }
+        iosArm64Test {
+            dependsOn appleTest
+        }
+    }
+}
+
+allprojects {
+    group = "com.ianrumac.redukks"
+    version = System.getenv("GITHUB_REF")?.split('/')?.last() ?: "development"
+}

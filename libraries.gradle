@@ -1,0 +1,11 @@
+ext {
+    versions = [
+            kotlinx_coroutines_version     : "1.7.0-Beta",
+            kotlinx_coroutines_test_version: "1.7.0-Beta",
+    ]
+
+    libraries = [
+            kotlinx_coroutines     : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlinx_coroutines_version}",
+            kotlinx_coroutines_test: "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.kotlinx_coroutines_test_version}",
+    ]
+}
