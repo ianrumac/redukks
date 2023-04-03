@@ -1,0 +1,98 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// Stub secrets to let the project sync and build without the publication values set up
+ext['signing.keyId'] = null
+ext['signing.password'] = null
+ext['signing.key'] = null
+ext['ossrhUsername'] = null
+ext['ossrhPassword'] = null
+
+// Grabbing secrets from local.properties file or from environment variables, which could be used on CI
+def secretPropsFile = project.rootProject.file("local.properties")
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    new FileInputStream(secretPropsFile).withCloseable { is -> p.load(is) }
+    p.each { name, value -> ext[name] = value }
+} else {
+    ext['signing.keyId'] = System.getenv("SIGNING_KEY_ID")
+    ext['signing.password'] = System.getenv("SIGNING_PASSWORD")
+    ext['signing.key'] = System.getenv("SIGNING_KEY")
+    ext['ossrhUsername'] = System.getenv("OSSRH_USERNAME")
+    ext['ossrhPassword'] = System.getenv("OSSRH_PASSWORD")
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+}
+
+String getExtraString(String name) {
+    return ext[name]?.toString()
+}
+
+publishing {
+    // Configure maven central repository
+    repositories {
+        maven {
+            name = "sonatype"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = getExtraString("ossrhUsername")
+                password = getExtraString("ossrhPassword")
+            }
+        }
+    }
+
+    // Configure all publications
+    publications.withType(MavenPublication) {
+
+        // Stub javadoc.jar artifact
+        artifact tasks.javadocJar
+
+        // Provide artifacts information requited by Maven Central
+        pom {
+            name = "Redukks Multiplatform"
+            description = "Redukks library for Redux-like state management in Kotlin Multiplatform"
+            url = "https://github.com/ianrumac/redukks"
+
+            licenses {
+                license {
+                    name = "MIT"
+                    url = "https://opensource.org/licenses/MIT"
+                }
+            }
+            developers {
+                developer {
+                    id = "ianrumac"
+                    name = "Ian Rumac"
+                    email = "ianrumac@gmail.com"
+                }
+            }
+            scm {
+                url = "https://github.com/ianrumac/redukks"
+            }
+        }
+    }
+}
+
+// Signing artifacts. Signing.* extra properties values will be used
+signing {
+    def keyId = project.property('signing.keyId')
+    def secretKeyBase64 = project.property('signing.key')
+    def secretKey = base64Decode(secretKeyBase64)
+    def password = project.property('signing.password')
+
+    println(keyId)
+    useInMemoryPgpKeys(keyId, secretKey, password)
+    sign publishing.publications
+}
+
+
+def base64Decode(encodedString){
+    if(encodedString != null) {
+        byte[] decoded = encodedString.decodeBase64()
+        String decode = new String(decoded)
+        return decode
+    }
+    return null;
+}

@@ -1,9 +1,10 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '1.8.0'
     id 'org.jetbrains.kotlin.native.cocoapods' version "1.8.10"
-    id 'maven-publish'
+
 }
 apply from: 'libraries.gradle'
+apply from: "publish.gradle"
 
 group = 'com.ianrumac'
 version = '0.1.0'
@@ -11,28 +12,6 @@ version = '0.1.0'
 repositories {
     mavenCentral()
 }
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/ianrumac/redukks") // Github Package
-            credentials {
-                username = System.getenv("GPR_USER")
-                password = System.getenv("GPR_API_KEY")
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            groupId = "com.ianrumac.redukks"
-            version = this.version
-            artifactId = "redukks"
-        }
-    }
-
-}
-
 
 kotlin {
     iosX64()

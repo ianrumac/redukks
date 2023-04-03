@@ -1,5 +1,9 @@
 # Redukks
 
+[![Redukks](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/ianrumac/redukks)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
+[!GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/ianrumac/redukks/release?branch=main)
+
 ### A simple, type-safe, and testable redux/uniflow implementation for Kotlin Multiplatform
 
 A set of simple type-safe abstractions needed to implement Redux-like architecture on Kotlin Multiplatform.
@@ -24,14 +28,20 @@ while still not tying you completely to a single pattern, providing you with abs
 
 1. Add the dependency to your project
 
+Gradle Groovy:
 ```groovy
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
     dependencies {
-        implementation 'com.ianrumac.redukks:0.1.0'
+        implementation 'com.ianrumac:redukks:$version'
     }
 ```
+
+Gradle Kotlin:
+```kotlin
+        implementation("com.ianrumac:redukks:$version")
+```
+
+
+
 
 2. Define a state type and it's updates
 ```kotlin
