@@ -2,7 +2,6 @@ plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '1.8.0'
     id 'org.jetbrains.kotlin.native.cocoapods' version "1.8.10"
     id 'maven-publish'
-    id 'com.chromaticnoise.multiplatform-swiftpackage' version "2.0.3"
 }
 apply from: 'libraries.gradle'
 
@@ -38,7 +37,7 @@ publishing {
 kotlin {
     iosX64()
     iosArm64()
-    iosSimulatorArm64()
+    ios()
 
     cocoapods {
         summary = "Redukks library for Redux-like state management in Kotlin Multiplatform"
@@ -57,7 +56,7 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    js(BOTH) {
+    js(IR) {
         browser {
             commonWebpackConfig {
                 cssSupport {
@@ -106,9 +105,6 @@ kotlin {
         }
 
         iosTest {
-            dependsOn appleTest
-        }
-        iosSimulatorArm64Test {
             dependsOn appleTest
         }
         iosX64Test {
