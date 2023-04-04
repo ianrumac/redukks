@@ -58,7 +58,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation libraries.kotlinx_coroutines
+                api libraries.kotlinx_coroutines
             }
         }
         commonTest {
