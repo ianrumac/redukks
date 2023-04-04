@@ -31,13 +31,13 @@ while still not tying you completely to a single pattern, providing you with abs
 Gradle Groovy:
 ```groovy
     dependencies {
-        implementation 'com.ianrumac:redukks:$version'
+        implementation 'com.ianrumac.redukks:redukks:$version'
     }
 ```
 
 Gradle Kotlin:
 ```kotlin
-        implementation("com.ianrumac:redukks:$version")
+        implementation("com.ianrumac.redukks:redukks:$version")
 ```
 
 
