@@ -1,6 +1,9 @@
-# Redukks
+# Redukks [WIP]
+This library is still WIP.
+The API is complete but there is still work to be done to make it production ready on all platforms.
 
-[![Redukks](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/ianrumac/redukks)
+
+[![Redukks](https://img.shields.io/badge/version-0.1.1-blue)](https://github.com/ianrumac/redukks)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
 [!GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/ianrumac/redukks/release?branch=main)
 
