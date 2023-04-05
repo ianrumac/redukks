@@ -3,9 +3,8 @@
 This library is still WIP.
 The API is complete but there is still work to be done to make it production ready on all platforms.
 
-[![Redukks](https://img.shields.io/badge/version-0.1.1-blue)](https://github.com/ianrumac/redukks)
+[![Redukks](https://img.shields.io/badge/version-0.1.2-blue)](https://github.com/ianrumac/redukks)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
-[!GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/ianrumac/redukks/release?branch=main)
 
 ### A simple, type-safe, and testable redux/uniflow implementation for Kotlin Multiplatform
 
@@ -37,14 +36,14 @@ Gradle Groovy:
 
 ```groovy
     dependencies {
-    implementation 'com.ianrumac.redukks:redukks:$version'
+    implementation 'com.ianrumac.redukks:redukks:0.1.2'
 }
 ```
 
 Gradle Kotlin:
 
 ```kotlin
-        implementation("com.ianrumac.redukks:redukks:$version")
+        implementation("com.ianrumac.redukks:redukks:0.1.2")
 ```
 
 2. Define a state type and it's updates
@@ -101,7 +100,10 @@ data class CountWithAnAPI(val scope: CoroutineScope) : CountContext {
 }
 
 val context = CountWithAnAPI(scope)
-context.handler.dispatch(Actions.Add(1))
+
+//In a class that implements Dispatcher<Actions>
+//This is actually a call to context.handler.dispatch(Actions.Add(1))
+dispatch(Actions.Add(1))
 ```
 
 6. To make it easier to read, you can define it all under a context interface:
@@ -343,8 +345,11 @@ data class CountWithAnAPI(val scope: CoroutineScope) : CountContext {
     override val handler = TypedActionDispatcher(scope, this)
 }
 
-context.handler.dispatch(Actions.Add(1))
-context.handler.dispatch(Actions.Subtract(1))
+//In a class that implements Dispatcher<Actions>, like a viewmodel that delegates it to the handler
+//This is actually a call to context.handler.dispatch(Actions.Add(1))
+
+dispatch(Actions.Add(1))
+dispatch(Actions.Subtract(1))
 
 ```
 
