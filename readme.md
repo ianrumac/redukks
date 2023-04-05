@@ -1,7 +1,7 @@
 # Redukks [WIP]
 
 This library is still WIP.
-The API is complete but there is still work to be done to make it production ready on all platforms.
+The API is mostly complete and will not be changing, but there is still work to be done to make it production ready on all platforms.
 
 [![Redukks](https://img.shields.io/badge/version-0.1.2-blue)](https://github.com/ianrumac/redukks)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
@@ -11,22 +11,64 @@ The API is complete but there is still work to be done to make it production rea
 A set of simple type-safe abstractions needed to implement Redux-like architecture on Kotlin Multiplatform.
 It simplifies the creation of stores, reducers and actions, and provides a simple way to test them.
 
+
 ### Why Redukks?
 
 While there are many redux implementations for Kotlin/Kotlin Multiplatform, most of them are either too complex, or too
 simple.
-Either the naming is too "reduxy", the implementation is a wrapper around a "when" statement, or the abstractions are
-too complex
-to be written on the regular. I've found myself re-using the same set of abstractions through the years,
+Either the naming is too "reduxy", they force you into one way of doing things or the abstractions are
+too complex to be written on the regular. I've found myself re-using the same set of abstractions through the years,
 so now I've decided to make them into a library I can both re-use and share.
 
 The goal is to provide simple, type-safe, and testable abstractions for redux-like architecture,
 while still not tying you completely to a single pattern, providing you with abstractions that can help you build your
-own solution.
+own solution. While most libraries try to push for a full-on redux pattern, reducers can be an overhead
+for some simple cases, and you should be able to avoid them if you want to - that's why Redukks doesn't *enforce* the Redux pattern itself.
 
-## How redux works?
+
+### What problems can it help me solve?
+
+
+* **State Management**: Redukks provides a simple way to manage your state, update it in a predictable way and listen to changes. You can use
+  it to manage the state of your whole app, a single feature, have a shared state between different features (screens) or have multiple states for one screen.
+  
+
+
+* **Action handling**: Redukks provides a simple way to handle actions, and execute them in a predictable way. You can use it to handle
+  actions from the UI, network calls, or any other work you might need. The unopinionated nature of the library allows you to implement your own
+action handlers specific to your usecase - even letting you break the uniflow pattern by implementing backwards signalling.
+
+
+* **Testing**: With Redukks, testing your state, reducers and actions is incredibly simple - both due to the nature of the API and the extra compile safety. You can easily test your state management logic,
+  or your action handling logic without the need for complex testing API's. 
+
+
+
+## How uniflow/redux works?
+
+The uniflow architecture is based on one simple idea - your app is a constant cycle of data that flows in one direction.
+The state and it's changes are driven by the UI, and the UI is driven by the state. This allows you to have a single source of truth
+and provides you with a simple way to think and reason about your app.
+
+Meanwhile, Redux is a pattern that helps you manage your state. It's based on the idea that your state is a single source of truth,
+and that it should be updated in a predictable manner.
+
+Redukks is a combination of these two ideas - it provides you the basic abstractions to implement
+uniflow and Redux-based architectures but doesn't force you into a single way of doing things.
 
 !["How redux works"](./redux.png)
+
+
+The flow itself is quite simple - you have a state X and you have N ways to change it.
+Those ways to change it are called "reducers" and they are the only way to change that state.
+So instead of wildly updating it from wherever we please, we define a set of "Updates" that can be used to update the state.
+
+But, since most applications are more complex than a simple counter, you need a way to handle complex work too.
+That's where actions come in. You "dispatch" an action and it executes some work, and during that execution, it can update the state via reducers or invoke other actions.
+
+This makes it easy to define and test all the possible permutations of state changes, and makes it easy to reason about the state of your app and be confident it works how you intended.
+
+
 
 ## Quickstart
 
@@ -35,7 +77,7 @@ own solution.
 Gradle Groovy:
 
 ```groovy
-    dependencies {
+dependencies {
     implementation 'com.ianrumac.redukks:redukks:0.1.2'
 }
 ```
@@ -43,7 +85,7 @@ Gradle Groovy:
 Gradle Kotlin:
 
 ```kotlin
-        implementation("com.ianrumac.redukks:redukks:0.1.2")
+    implementation("com.ianrumac.redukks:redukks:0.1.2")
 ```
 
 2. Define a state type and it's updates
@@ -61,10 +103,10 @@ sealed class Updates(override val reduce: (CountState) -> CountState) : Reducer<
 }
 ```
 
-3. Create a `FeatureContext` class that contains all the dependencies for your feature.
+3. Create a `FeatureContext` class that contains all the dependencies for your feature (or for your actions).
 
 ```kotlin
-  interface CountContext {
+interface CountContext {
     val client: CountingAPI
     val store: Store<CountState>
 }
@@ -109,36 +151,36 @@ dispatch(Actions.Add(1))
 6. To make it easier to read, you can define it all under a context interface:
 
 ```kotlin
-    interface CountContext {
-    val client: CountingAPI
-    val store: Store<CountState>
-    val handler: ActionDispatcher<Actions>
+  interface CountContext {
+  val client: CountingAPI
+  val store: Store<CountState>
+  val handler: ActionDispatcher<Actions>
 
 
-    data class CountState(val total: Int)
-    sealed class Updates(override val reduce: (CountState) -> CountState) : Reducer<CountState> {
-        class Add(val number: Int) : Updates({
-            state.copy(state.total + number)
-        })
-        class Subtract(val number: Int) : Updates({
-            state.copy(state.total - number)
-        })
-    }
+  data class CountState(val total: Int)
+  sealed class Updates(override val reduce: (CountState) -> CountState) : Reducer<CountState> {
+      class Add(val number: Int) : Updates({
+          state.copy(state.total + number)
+      })
+      class Subtract(val number: Int) : Updates({
+          state.copy(state.total - number)
+      })
+  }
 
 
-    sealed class Actions(override val execute: suspend CountContext.() -> Unit) : TypedAction<CountContext> {
-        class AddToClient(val number: Int) : Actions({
-            //here, we have access to all the CountContext properties that are captured during execution
-            //For example, we can access the store and update it with the result of the network call.
-            val result = client.add(number)
-            state.update(Updates.Add(result))
-        })
+  sealed class Actions(override val execute: suspend CountContext.() -> Unit) : TypedAction<CountContext> {
+      class AddToClient(val number: Int) : Actions({
+          //here, we have access to all the CountContext properties that are captured during execution
+          //For example, we can access the store and update it with the result of the network call.
+          val result = client.add(number)
+          state.update(Updates.Add(result))
+      })
 
-        class SubtractFromClient(val number: Int) : Actions({
-            val result = client.subtract(number)
-            state.update(Updates.Subtract(result))
-        })
-    }
+      class SubtractFromClient(val number: Int) : Actions({
+          val result = client.subtract(number)
+          state.update(Updates.Subtract(result))
+      })
+  }
 }
 ```
 
@@ -155,8 +197,8 @@ context.store.listen().collectLatest { state ->
 
 ## For Android developers
 
-You can use Redukks with Android's ViewModel easily. You can collect the store as a StateFlow or use it with LiveData.
-Your ViewModel can also implement `Dispatcher<Actions>` so you can dispatch the actions upstream.
+You can easily use Redukks with Android's ViewModel and it fits great with Jetpack Compose (and the View framework too!).
+Simply collect the store as a StateFlow or use it with LiveData. Your ViewModel can also implement `Dispatcher<Actions>` so you can dispatch the actions upstream (delegate them to the action handler).
 You can also create abstractions for this such as a `ReduxViewModel` that handle these things for you.
 
 Using it with a viewmodel is simple:
@@ -178,9 +220,9 @@ class CountViewModel @Inject constructor(
 ```
 
 You can also control the lifecycle of your state by hoisting it up or down in the lifecycle scope tree.
-i.e. if you need to share a state store, you can just move it up from i.e. a fragment scope to an activity scope
+For example, if you need to share a state store, you can just move it up from i.e. a fragment scope to an activity scope
 and pass it downwards to the fragments. This way, you can share the state between fragments, but still have
-only a single state store. You can even provide multiple stores, i.e.
+only a single state store. You can even provide multiple stores for an action, or provide multiple stores to your UI to combine.
 
 ```kotlin
 typealias CountStore = Store<CountState>
@@ -206,7 +248,7 @@ class AddForUser : Actions({
 ```
 
 This works beautifully with Jetpack Compose, since you can easily derive the UI from the state (please, map it
-to a viewmodel before doing so).
+to a viewmodel class before doing so, don't mix your core models and your UI models).
 
 !["How redux works on Android"](./redux_android.png)
 
@@ -271,7 +313,7 @@ val basicStore = BasicStore(CountState(0))
 val store = BasicReducedStore<CountState, Updates>(basicStore)
 
 //or use the helper function
-//val store = createReducedStore<CountState,Updates>(CountState(0))
+val store = createReducedStore<CountState,Updates>(CountState(0))
 
 store.update(Updates.Add(1))
 store.listen().collectLatest { state ->
@@ -342,7 +384,7 @@ Now, we can implement the context and use the dispatcher to execute actions:
 data class CountWithAnAPI(val scope: CoroutineScope) : CountContext {
     override val client = CountingAPI()
     override val store = BasicReducedStore<CountState, Updates>(CountState(0))
-    override val handler = TypedActionDispatcher(scope, this)
+    override val handler = createActionHandler(scope, this)
 }
 
 //In a class that implements Dispatcher<Actions>, like a viewmodel that delegates it to the handler
