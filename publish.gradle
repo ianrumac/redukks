@@ -30,18 +30,18 @@ String getExtraString(String name) {
     return project.ext[name]?.toString()
 }
 
-publishing {
-    // Configure maven central repository
+nexusPublishing {
     repositories {
-        maven {
-            name = "sonatype"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = getExtraString("ossrhUsername")
-                password = getExtraString("ossrhPassword")
-            }
+        sonatype {  //only for users registered in Sonatype after 24 Feb 2021
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username = getExtraString("ossrhUsername")
+            password = getExtraString("ossrhPassword")
         }
     }
+}
+
+publishing {
 
     // Configure all publications
     publications.withType(MavenPublication) {
@@ -69,7 +69,9 @@ publishing {
                 }
             }
             scm {
-                url = "https://github.com/ianrumac/redukks"
+                url = "https://github.com/ianrumac/redukks/tree/main"
+                connection = 'scm:git:github.com/ianrumac/redukks.git'
+                developerConnection = 'scm:git:ssh://github.com/ianrumac/redukks.git'
             }
         }
     }
@@ -86,8 +88,8 @@ signing {
 }
 
 
-def base64Decode(encodedString){
-    if(encodedString != null) {
+def base64Decode(encodedString) {
+    if (encodedString != null) {
         byte[] decoded = encodedString.decodeBase64()
         String decode = new String(decoded)
         return decode
