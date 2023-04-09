@@ -3,7 +3,7 @@
 This library is still WIP.
 The API is mostly complete and will not be changing, but there is still work to be done to make it production ready on all platforms.
 
-[![Redukks](https://img.shields.io/badge/version-0.1.2-blue)](https://github.com/ianrumac/redukks)
+[![Redukks](https://img.shields.io/badge/version-0.1.4-blue)](https://github.com/ianrumac/redukks)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
 
 ### A simple, type-safe, and testable redux/uniflow implementation for Kotlin Multiplatform
@@ -78,14 +78,14 @@ Gradle Groovy:
 
 ```groovy
 dependencies {
-    implementation 'com.ianrumac.redukks:redukks:0.1.2'
+    implementation 'com.ianrumac.redukks:redukks:0.1.4'
 }
 ```
 
 Gradle Kotlin:
 
 ```kotlin
-    implementation("com.ianrumac.redukks:redukks:0.1.2")
+    implementation("com.ianrumac.redukks:redukks:0.1.4")
 ```
 
 2. Define a state type and it's updates

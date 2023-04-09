@@ -1,7 +1,7 @@
 ext {
     versions = [
-            kotlinx_coroutines_version     : "1.7.0-Beta",
-            kotlinx_coroutines_test_version: "1.7.0-Beta",
+            kotlinx_coroutines_version     : "1.6.4",
+            kotlinx_coroutines_test_version: "1.6.4",
     ]
 
     libraries = [
