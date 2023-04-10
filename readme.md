@@ -25,6 +25,7 @@ while still not tying you completely to a single pattern, providing you with abs
 own solution. While most libraries try to push for a full-on redux pattern, reducers can be an overhead
 for some simple cases, and you should be able to avoid them if you want to - that's why Redukks doesn't *enforce* the Redux pattern itself.
 
+For more reasoning on why uniflow and why redux, you can check out the talk [(de)constructing architecture](https://speakerdeck.com/ianrumac/de-constructing-architecture).
 
 ### What problems can it help me solve?
 
@@ -41,7 +42,6 @@ action handlers specific to your usecase - even letting you break the uniflow pa
 
 * **Testing**: With Redukks, testing your state, reducers and actions is incredibly simple - both due to the nature of the API and the extra compile safety. You can easily test your state management logic,
   or your action handling logic without the need for complex testing API's. 
-
 
 
 ## How uniflow/redux works?
