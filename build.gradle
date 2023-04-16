@@ -104,5 +104,4 @@ kotlin {
 
 allprojects {
     group = "com.ianrumac.redukks"
-    version = System.getenv("GITHUB_REF")?.split('/')?.last() ?: "development"
 }

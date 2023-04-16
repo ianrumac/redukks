@@ -1,24 +1,29 @@
-# Redukks [WIP]
+# Redukks
 
-This library is still WIP.
+This library is in alpha.
 The API is mostly complete and will not be changing, but there is still work to be done to make it production ready on all platforms.
+For JVM and multiplatform, the library is ready for production use, but for iOS, JS and native it still isn't completely set up.
+If you want to help, feel free to open an issue or a PR.
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.ianrumac.redukks/redukks)](https://search.maven.org/artifact/com.ianrumac.redukks/redukks)
 [![Redukks](https://img.shields.io/badge/version-0.1.4-blue)](https://github.com/ianrumac/redukks)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)](https://kotlinlang.org)
+![Weekly](https://androidweekly.net/issues/issue-566/badge)
 
-### A simple, type-safe, and testable redux/uniflow implementation for Kotlin Multiplatform
+### A simple, type-safe, and testable redux/uniflow architecture implementation for Kotlin Multiplatform
 
-A set of simple type-safe abstractions needed to implement Redux-like architecture on Kotlin Multiplatform.
+Redukks is a set of simple type-safe abstractions needed to implement uniflow and Redux-like architecture on Kotlin Multiplatform.
 It simplifies the creation of stores, reducers and actions, and provides a simple way to test them.
 
 
 ### Why Redukks?
 
-While there are many redux implementations for Kotlin/Kotlin Multiplatform, most of them are either too complex, or too
-simple.
-Either the naming is too "reduxy", they force you into one way of doing things or the abstractions are
-too complex to be written on the regular. I've found myself re-using the same set of abstractions through the years,
-so now I've decided to make them into a library I can both re-use and share.
+While there are many uniflow or redux implementations for Kotlin/Kotlin Multiplatform, most of them are either too complex, or too
+simple. Either the naming is too "reduxy", they force you into one way of doing things or the abstractions are
+too complex to be written on the regular. And while there are architectures that conform to this style, the naming they use is quite specific for Android and confusing to non-android developers,
+making it harder to reason about or discuss with other developers.
+
+Since I've found myself re-using the same set of abstractions through the years, I've decided to make them into a library I can both re-use and share.
 
 The goal is to provide simple, type-safe, and testable abstractions for redux-like architecture,
 while still not tying you completely to a single pattern, providing you with abstractions that can help you build your
@@ -151,7 +156,7 @@ dispatch(Actions.Add(1))
 6. To make it easier to read, you can define it all under a context interface:
 
 ```kotlin
-  interface CountContext {
+interface CountContext {
   val client: CountingAPI
   val store: Store<CountState>
   val handler: ActionDispatcher<Actions>
@@ -219,6 +224,14 @@ class CountViewModel @Inject constructor(
 }
 ```
 
+And now in your UI you can simply do:
+
+```kotlin 
+ val vm : CountViewModel by viewModels()
+  ...
+ vm.dispatch(Actions.AddToClient(1))
+```
+
 You can also control the lifecycle of your state by hoisting it up or down in the lifecycle scope tree.
 For example, if you need to share a state store, you can just move it up from i.e. a fragment scope to an activity scope
 and pass it downwards to the fragments. This way, you can share the state between fragments, but still have
@@ -259,7 +272,8 @@ Redukks provides a few default implementations of the abstractions, but you can 
 
 Let's start with the simplest case, a simple store.
 We'll start with a simple counter implementation, with only a store without reducers or actions.
-
+In general, if you prefer not to write reducers, you can use the `BasicStore` class, which is a simple store exposing
+an `update` function with a closure that takes in the current state and returns a new state.
 ```kotlin
 
 data class CountState(val total: Int)
@@ -283,10 +297,9 @@ meaning they have a `reduce` closure that takes in the current state and returns
 It's like writing
 
 ```kotlin
-fun addNumber(number: Int) {
-    store.update { state -> state.copy(state.total + number) }
+fun addNumber(state: CountState, number: Int) : CountState {
+    return state.copy(state.total + number)
 }
-
 ```
 
 but with a bit more type safety, so that you can be certain all possible state changes are predefined and tested.
